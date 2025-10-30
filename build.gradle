@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+    id 'io.qameta.allure' version '2.12.0'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.seleniumhq.selenium:selenium-java:4.38.0'
+    testImplementation 'org.testng:testng:7.11.0'
+    implementation 'org.slf4j:slf4j-api:2.0.17'
+    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.25.2'
+    implementation 'commons-io:commons-io:2.20.0'
+    implementation 'io.qameta.allure:allure-testng:2.30.0'
+    implementation 'io.github.bonigarcia:webdrivermanager:6.3.2'
+}
+
+test {
+    useTestNG()
+}
+
+allure {
+    report {
+        version = '2.30.0'
+    }
+}
+tasks.named('allureReport') { dependsOn tasks.named('test') }
+tasks.named('allureServe') { dependsOn tasks.named('test') }
