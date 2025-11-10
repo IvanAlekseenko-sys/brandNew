@@ -18,31 +18,42 @@ public class BaseTest {
     @BeforeMethod
     public void setUp() {
         WebDriverManager.chromedriver().setup();
-        boolean headless = Boolean.parseBoolean(System.getProperty("headless", "false"));
-        ChromeOptions opts = new ChromeOptions();
+
+        ChromeOptions options = new ChromeOptions();
+
+        // общий набор для CI
+        options.addArguments(
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--window-size=1920,1080"
+        );
+
+        // читаем системное свойство -Dheadless=true|false (по умолчанию true в CI)
+        boolean headless = Boolean.parseBoolean(System.getProperty("headless", "true"));
         if (headless) {
-            opts.addArguments("--headless=new", "--window-size=1920,1080");
-        } else {
-            opts.addArguments("--start-maximized");
+            // для новых Chrome лучше "new" режим
+            options.addArguments("--headless=new");
         }
 
-        driver = new ChromeDriver(opts);
-        logger.info("Browser started{}", headless ? " (headless)" : " and maximized");
+        options.addArguments("--start-maximized");
+
+        driver = new ChromeDriver(options);
+        driver.manage().window().maximize();
+        logger.info("Browser started (headless={}) and maximized", headless);
     }
 
-
-protected void openBaseUrl() {
-    String baseUrl = ConfigReader.getProperty("baseUrl");
-    logger.info("Navigating to: {}", baseUrl);
-    driver.get(baseUrl);
-}
-
-@AfterMethod
-public void tearDown() {
-    if (driver != null) {
-        driver.quit();
-        logger.info("Browser closed");
+    protected void openBaseUrl() {
+        String baseUrl = ConfigReader.getProperty("baseUrl");
+        logger.info("Navigating to: {}", baseUrl);
+        driver.get(baseUrl);
     }
-}
 
+    @AfterMethod
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
+            logger.info("Browser closed");
+        }
+    }
 }
