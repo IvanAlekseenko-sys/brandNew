@@ -1,5 +1,5 @@
 pipeline {
-  agent { label 'linux' } // или твой лейбл
+  agent any
 
   options {
     timestamps()
