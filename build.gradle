@@ -6,22 +6,42 @@ plugins {
 group = 'org.example'
 version = '1.0-SNAPSHOT'
 
+
+java {
+
+    toolchain {
+
+        languageVersion = JavaLanguageVersion.of(17)
+
+    }
+
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'org.seleniumhq.selenium:selenium-java:4.38.0'
+    testImplementation 'org.seleniumhq.selenium:selenium-java:4.38.0'
     testImplementation 'org.testng:testng:7.11.0'
-    implementation 'org.slf4j:slf4j-api:2.0.17'
-    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.25.2'
-    implementation 'commons-io:commons-io:2.20.0'
-    implementation 'io.qameta.allure:allure-testng:2.30.0'
-    implementation 'io.github.bonigarcia:webdrivermanager:6.3.2'
+    testImplementation 'org.slf4j:slf4j-api:2.0.17'
+    testRuntimeOnly  'org.apache.logging.log4j:log4j-slf4j2-impl:2.25.2'
+    testRuntimeOnly  'org.apache.logging.log4j:log4j-core:2.25.2'
+    testRuntimeOnly  'org.apache.logging.log4j:log4j-api:2.25.2'
+    testImplementation 'commons-io:commons-io:2.20.0'
+    testImplementation 'io.qameta.allure:allure-testng:2.30.0'
+    testImplementation 'io.github.bonigarcia:webdrivermanager:6.3.2'
 }
 
 test {
-    useTestNG()
+    useTestNG() {
+        suites 'src/test/resources/testng.xml'
+    }
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
 }
 
 allure {
