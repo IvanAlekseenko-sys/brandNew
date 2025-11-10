@@ -1,15 +1,18 @@
 pipeline {
-  agent any
-  options { timestamps(); ansiColor('xterm') }
-  environment { ALLURE_TOOL = 'allure-2.30.0' }
+  agent { label 'linux' } // или твой лейбл
+
+  options {
+    timestamps()
+  }
+
+  environment {
+    ALLURE_TOOL = 'allure-2.35.1'
+  }
 
   stages {
     stage('Checkout') {
       steps {
-        checkout([$class: 'GitSCM',
-          branches: [[name: '*/main']],
-          userRemoteConfigs: [[url: 'https://github.com/IvanAlekseenko-sys/brandNew.git']]
-        ])
+        checkout scm
       }
     }
 
@@ -18,7 +21,7 @@ pipeline {
         sh '''
           set -eux
           chmod +x gradlew
-          ./gradlew clean test -Dheadless=true --no-daemon
+          ./gradlew clean test --no-daemon --info --stacktrace -Dheadless=true
         '''
       }
       post {
@@ -33,11 +36,14 @@ pipeline {
     stage('Allure Report') {
       steps {
         allure([
-          includeProperties: false,
-          reportBuildPolicy: 'ALWAYS',
-          results: [[path: 'allure-results']]
+          results: [[path: 'allure-results']],
+          reportBuildPolicy: 'ALWAYS'
         ])
       }
     }
+  }
+
+  post {
+    always { echo 'Done.' }
   }
 }
